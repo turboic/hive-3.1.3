@@ -1,0 +1,385 @@
+<configuration>
+  <property>
+    <name>javax.jdo.option.ConnectionURL</name>
+    <value>jdbc:mysql://10.7.215.51:3306/hive?createDatabaseIfNotExist=true</value>
+  </property>
+  <property>
+    <name>javax.jdo.option.ConnectionDriverName</name>
+    <value>com.mysql.cj.jdbc.Driver</value>
+  </property>
+  <property>
+    <name>javax.jdo.option.ConnectionUserName</name>
+    <value>root</value>
+  </property>
+  <property>
+    <name>javax.jdo.option.ConnectionPassword</name>
+    <value>123456</value>
+  </property>
+  <property>
+    <name>hive.exec.scratchdir</name>
+    <value>/cluster/hive</value>
+  </property>
+  <property>
+    <name>hive.querylog.location</name>
+    <value>/cluster/hive</value>
+  </property>
+  <property>
+    <name>metastore.metastore.event.db.notification.api.auth</name>
+    <value>false</value>
+  </property>  
+  <property>
+    <name>hive.downloaded.resources.dir</name>
+    <value>/cluster/hive</value>
+  </property>
+   <!-- 是否启用Hive Server2日志记录操作 -->
+  <property>
+    <name>hive.server2.logging.operation.enabled</name>
+    <value>true</value>
+  </property>
+  <!-- Hive Server2操作日志的存储位置 -->
+  <property>
+    <name>hive.server2.logging.operation.log.location</name>
+    <value>/cluster/hive/logs</value>
+  </property>
+  <!-- Hive元数据存储的URI -->
+  <property>
+    <name>hive.metastore.uris</name>
+    <value>thrift://10.7.215.51:9083</value>
+  </property>
+  <!-- Hive元数据客户端套接字超时时间（以毫秒为单位） -->
+  <property>
+    <name>hive.metastore.client.socket.timeout</name>
+    <value>3000</value>
+  </property>
+  <!-- Hive数据仓库目录 -->
+  <property>
+    <name>hive.metastore.warehouse.dir</name>
+    <value>/cluster/hive/warehouse</value>
+  </property>
+  <property>
+    <name>spark.sql.warehouse.dir</name>
+    <value>/cluster/hive/sparksql</value>
+  </property>
+  <!-- 自动转换连接类型的Join操作 -->
+  <property>
+    <name>hive.auto.convert.join</name>
+    <value>true</value>
+  </property>
+  <!-- 自动转换连接类型的Join操作时条件不满足的最大数据量（以字节为单位） -->
+  <property>
+    <name>hive.auto.convert.join.noconditionaltask.size</name>
+    <value>20971520</value>
+  </property>
+  <!-- 是否优化Bucket Map Join的Sorted Merge -->
+  <property>
+    <name>hive.optimize.bucketmapjoin.sortedmerge</name>
+    <value>false</value>
+  </property>
+  <!-- SMB Join操作缓存的行数 -->
+  <property>
+    <name>hive.smbjoin.cache.rows</name>
+    <value>10000</value>
+  </property>
+  <!-- MapReduce作业的Reduce任务数 -->
+  <property>
+    <name>mapred.reduce.tasks</name>
+    <value>-1</value>
+  </property>
+  <!-- 每个Reduce任务的数据量（以字节为单位） -->
+  <property>
+    <name>hive.exec.reducers.bytes.per.reducer</name>
+    <value>67108864</value>
+  </property>
+  <!-- 最大允许复制文件的大小（以字节为单位） -->
+  <property>
+    <name>hive.exec.copyfile.maxsize</name>
+    <value>33554432</value>
+  </property>
+  <!-- 同时运行的最大Reduce任务数 -->
+  <property>
+    <name>hive.exec.reducers.max</name>
+    <value>1099</value>
+  </property>
+  <!-- Vectorized Group By操作的检查间隔 -->
+  <property>
+    <name>hive.vectorized.groupby.checkinterval</name>
+    <value>4096</value>
+  </property>
+  <!-- Vectorized Group By操作的Flush比例 -->
+  <property>
+    <name>hive.vectorized.groupby.flush.percent</name>
+    <value>0.1</value>
+  </property>
+  <!-- 是否使用统计信息来优化查询计划 -->
+  <property>
+    <name>hive.compute.query.using.stats</name>
+    <value>false</value>
+  </property>
+  <!-- 是否启用向量化执行引擎 -->
+  <property>
+    <name>hive.vectorized.execution.enabled</name>
+    <value>true</value>
+  </property>
+  <!-- 是否在Reduce阶段启用向量化执行 -->
+  <property>
+    <name>hive.vectorized.execution.reduce.enabled</name>
+    <value>true</value>
+  </property>
+  <!-- 是否使用向量化输入格式 -->
+  <property>
+    <name>hive.vectorized.use.vectorized.input.format</name>
+    <value>true</value>
+  </property>
+  <!-- 是否使用向量化序列化和反序列化 -->
+  <property>
+    <name>hive.vectorized.use.vector.serde.deserialize</name>
+    <value>false</value>
+  </property>
+  <!-- 向量化适配器的使用模式 -->
+  <property>
+    <name>hive.vectorized.adaptor.usage.mode</name>
+    <value>chosen</value>
+  </property>
+  <!-- 是否合并Map输出的小文件 -->
+  <property>
+    <name>hive.merge.mapfiles</name>
+    <value>true</value>
+  </property>
+  <!-- 是否合并MapReduce输出的小文件 -->
+  <property>
+    <name>hive.merge.mapredfiles</name>
+    <value>false</value>
+  </property>
+  <!-- 是否启用CBO优化 -->
+  <property>
+    <name>hive.cbo.enable</name>
+    <value>false</value>
+  </property>
+  <!-- Fetch任务转换级别 -->
+  <property>
+    <name>hive.fetch.task.conversion</name>
+    <value>minimal</value>
+  </property>
+  <!-- 触发Fetch任务转换的数据量阈值（以字节为单位） -->
+  <property>
+    <name>hive.fetch.task.conversion.threshold</name>
+    <value>268435456</value>
+  </property>
+  <!-- Limit操作的内存使用百分比 -->
+  <property>
+    <name>hive.limit.pushdown.memory.usage</name>
+    <value>0.1</value>
+  </property>
+  <!-- 是否合并Spark任务输出的小文件 -->
+  <property>
+    <name>hive.merge.sparkfiles</name>
+    <value>true</value>
+  </property>
+  <!-- 合并小文件时的平均大小（以字节为单位） -->
+  <property>
+    <name>hive.merge.smallfiles.avgsize</name>
+    <value>16777216</value>
+  </property>
+  <!-- 每个任务合并的数据量（以字节为单位） -->
+  <property>
+    <name>hive.merge.size.per.task</name>
+    <value>268435456</value>
+  </property>
+  <!-- 是否启用重复消除优化 -->
+  <property>
+    <name>hive.optimize.reducededuplication</name>
+    <value>true</value>
+  </property>
+  <!-- 最小Reduce任务数以启用重复消除优化 -->
+  <property>
+    <name>hive.optimize.reducededuplication.min.reducer</name>
+    <value>4</value>
+  </property>
+  <!-- 是否启用Map端聚合 -->
+  <property>
+    <name>hive.map.aggr</name>
+    <value>true</value>
+  </property>
+  <!-- Map端聚合的哈希表内存比例 -->
+  <property>
+    <name>hive.map.aggr.hash.percentmemory</name>
+    <value>0.5</value>
+  </property>
+  <property>
+    <name>hive.stats.column.autogather</name>
+    <value>false</value>
+  </property>
+  <!-- 是否优化动态分区排序 -->
+  <property>
+    <name>hive.optimize.sort.dynamic.partition</name>
+    <value>true</value>
+  </property>
+  <!-- Hive执行引擎类型（mr、tez、spark） -->
+  <!--原始配置引擎是mr-->
+  <property>
+    <name>hive.execution.engine</name>
+    <value>spark</value>
+  </property>
+  <property>
+    <name>hive.spark.client.connect.timeout</name>
+    <value>10000ms</value>
+  </property>
+  <!-- Spark Executor的内存大小 -->
+  <property>
+    <name>spark.executor.memory</name>
+    <value>2572261785b</value>
+  </property>
+  <!-- Spark Driver的内存大小 -->
+  <property>
+    <name>spark.driver.memory</name>
+    <value>3865470566b</value>
+  </property>
+  <!-- 每个Spark Executor的核心数 -->
+  <property>
+    <name>spark.executor.cores</name>
+    <value>4</value>
+  </property>
+  <!-- Spark Driver的内存Overhead -->
+  <property>
+    <name>spark.yarn.driver.memoryOverhead</name>
+    <value>409m</value>
+  </property>
+  <!-- Spark Executor的内存Overhead -->
+  <property>
+    <name>spark.yarn.executor.memoryOverhead</name>
+    <value>432m</value>
+  </property>
+  <!-- 是否启用动态资源分配 -->
+  <property>
+    <name>spark.dynamicAllocation.enabled</name>
+    <value>true</value>
+  </property>
+  <!-- 动态资源分配的初始Executor数量 -->
+  <property>
+    <name>spark.dynamicAllocation.initialExecutors</name>
+    <value>1</value>
+  </property>
+  <!-- 动态资源分配的最小Executor数量 -->
+  <property>
+    <name>spark.dynamicAllocation.minExecutors</name>
+    <value>1</value>
+  </property>
+  <!-- 动态资源分配的最大Executor数量 -->
+  <property>
+    <name>spark.dynamicAllocation.maxExecutors</name>
+    <value>2147483647</value>
+  </property>
+  <!-- 是否在Hive元数据存储中执行setugi操作 -->
+  <property>
+    <name>hive.metastore.execute.setugi</name>
+    <value>true</value>
+  </property>
+  <!-- 是否支持并发操作 -->
+  <property>
+    <name>hive.support.concurrency</name>
+    <value>true</value>
+  </property>
+  <!-- ZooKeeper服务器列表 -->
+  <property>
+    <name>hive.zookeeper.quorum</name>
+    <value>10.7.215.51</value>
+  </property>
+  <!-- ZooKeeper客户端端口号 -->
+  <property>
+    <name>hive.zookeeper.client.port</name>
+    <value>2181</value>
+  </property>
+  <!-- Hive使用的ZooKeeper命名空间 -->
+  <property>
+    <name>hive.zookeeper.namespace</name>
+    <value>hive_zookeeper_namespace_hive</value>
+  </property>
+  <!-- 集群委派令牌存储类 -->
+  <property>
+    <name>hive.cluster.delegation.token.store.class</name>
+    <value>org.apache.hadoop.hive.thrift.MemoryTokenStore</value>
+  </property>
+  <!-- 是否启用Hive Server2用户代理模式 -->
+  <property>
+    <name>hive.server2.enable.doAs</name>
+    <value>true</value>
+  </property>
+  <!-- 是否启用Spark Shuffle服务 -->
+  <property>
+    <name>spark.shuffle.service.enabled</name>
+    <value>true</value>
+  </property>
+  <!-- 是否执行严格的类型安全性检查 -->
+  <property>
+    <name>hive.strict.checks.type.safety</name>
+    <value>true</value>
+  </property>
+  <!-- 是否执行严格的笛卡尔积检查 -->
+  <property>
+    <name>hive.strict.checks.cartesian.product</name>
+    <value>false</value>
+  </property>
+  <!-- 是否执行严格的桶排序检查 -->
+  <property>
+    <name>hive.strict.checks.bucketing</name>
+    <value>true</value>
+  </property>
+  <!-- 指定hiveserver2连接的端口号 -->
+    <property>
+        <name>hive.server2.thrift.port</name>
+        <value>10000</value>
+    </property>        
+    <!-- 指定hiveserver2连接的host -->
+    <property>
+        <name>hive.server2.thrift.bind.host</name>
+        <value>10.7.215.51</value>
+    </property>
+	<property>
+		<name>hive.server2.webui.host</name>
+		<value>10.7.215.51</value>
+	</property>
+	<!-- hive服务的页面的端口 -->
+	<property>
+		<name>hive.server2.webui.port</name>
+		<value>10002</value>
+	</property>
+	<!-- Hive元数据存储版本的验证 -->
+    <property>
+        <name>hive.metastore.schema.verification</name>
+        <value>false</value>
+    </property>
+    <!-- hive方式访问客户端：打印 当前库 和 表头 -->
+    <property>
+        <name>hive.cli.print.header</name>
+        <value>true</value>
+    </property>
+    <property>
+        <name>hive.cli.print.current.db</name>
+        <value>true</value>
+    </property>
+	<property>
+        <name>hive.exec.dynamic.partition.mode</name>
+        <value>nonstrict</value>
+    </property>
+	<property>
+        <name>hive.txn.manager</name>
+        <value>org.apache.hadoop.hive.ql.lockmgr.DbTxnManager</value>
+    </property>
+	<property>
+         <name>hive.compactor.initiator.on</name>
+         <value>true</value>
+    </property>
+	<property>
+        <name>hive.compactor.worker.threads</name>
+        <value>1</value>
+    </property>
+	<!--Error rolling back: Can't call rollback when autocommit=true -->
+	<property>
+        <name>hive.in.test</name>
+        <value>true</value>
+    </property>
+	<property>
+        <name>metastore.client.capability.check</name>
+        <value>false</value>
+    </property>	
+</configuration>
