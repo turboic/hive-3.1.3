@@ -18,189 +18,181 @@
 
 package org.apache.hive.hplsql;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Properties;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.GnuParser;
 import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Option;
-import org.apache.commons.cli.Options;
 import org.apache.commons.cli.OptionBuilder;
+import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Properties;
 
 public class Arguments {
-  private CommandLine commandLine;
-  private Options options = new Options();
-  
-  String execString;
-  String fileName;  
-  String main;
-  Map<String, String> vars = new HashMap<String, String>();
-  
-  @SuppressWarnings("static-access")
-  Arguments() {
-    // -e 'query'
-    options.addOption(OptionBuilder
-        .hasArg()
-        .withArgName("quoted-query-string")
-        .withDescription("HPL/SQL from command line")
-        .create('e'));
+    private static final Logger LOG = LoggerFactory.getLogger(Arguments.class);
 
-    // -f <file>
-    options.addOption(OptionBuilder
-        .hasArg()
-        .withArgName("filename")
-        .withDescription("HPL/SQL from a file")
-        .create('f'));    
-    
-    // -main entry_point_name
-    options.addOption(OptionBuilder
-        .hasArg()
-        .withArgName("procname")
-        .withDescription("Entry point (procedure or function name)")
-        .create("main"));  
-    
-    // -hiveconf x=y
-    options.addOption(OptionBuilder
-        .withValueSeparator()
-        .hasArgs(2)
-        .withArgName("property=value")
-        .withLongOpt("hiveconf")
-        .withDescription("Value for given property")
-        .create());
-    
-    // Substitution option -d, --define
-    options.addOption(OptionBuilder
-        .withValueSeparator()
-        .hasArgs(2)
-        .withArgName("key=value")
-        .withLongOpt("define")
-        .withDescription("Variable substitution e.g. -d A=B or --define A=B")
-        .create('d'));
+    /**
+     * 命令行
+     */
+    private CommandLine commandLine;
+    private Options options = new Options();
 
-    // Substitution option --hivevar
-    options.addOption(OptionBuilder
-        .withValueSeparator()
-        .hasArgs(2)
-        .withArgName("key=value")
-        .withLongOpt("hivevar")
-        .withDescription("Variable substitution e.g. --hivevar A=B")
-        .create());
-    
-    // [-version|--version]
-    options.addOption(new Option("version", "version", false, "Print HPL/SQL version"));
+    String execString;
+    String fileName;
+    String main;
 
-    // [-trace|--trace]
-    options.addOption(new Option("trace", "trace", false, "Print debug information"));
-    
-    // [-offline|--offline]
-    options.addOption(new Option("offline", "offline", false, "Offline mode - skip SQL execution"));
-    
-    // [-H|--help]
-    options.addOption(new Option("H", "help", false, "Print help information"));
-  }
-  
-  /**
-   * Parse the command line arguments
-   */
-  public boolean parse(String[] args) {
-    try {
-      commandLine = new GnuParser().parse(options, args);
-      execString = commandLine.getOptionValue('e');
-      fileName = commandLine.getOptionValue('f');
-      main = commandLine.getOptionValue("main");
-      Properties p = commandLine.getOptionProperties("hiveconf");
-      for(String key : p.stringPropertyNames()) {
-        vars.put(key, p.getProperty(key));
-      }
-      p = commandLine.getOptionProperties("hivevar");
-      for(String key : p.stringPropertyNames()) {
-        vars.put(key, p.getProperty(key));
-      }
-      p = commandLine.getOptionProperties("define");
-      for(String key : p.stringPropertyNames()) {
-        vars.put(key, p.getProperty(key));
-      }
-    } catch (ParseException e) {
-      System.err.println(e.getMessage());
-      return false;
-    }
-    return true;
-  }
-  
-  /**
-   * Get the value of execution option -e
-   */
-  public String getExecString() {
-    return execString;
-  }
-  
-  /**
-   * Get the value of file option -f
-   */
-  public String getFileName() {
-    return fileName;
-  }
-  
-  /**
-   * Get the value of -main option
-   */
-  public String getMain() {
-    return main;
-  }
-  
-  /**
-   * Get the variables
-   */
-  public Map<String, String> getVars() {
-    return vars;
-  }
+    /**
+     * 变量
+     */
+    Map<String, String> vars = new HashMap<String, String>();
 
-  /**
-   * Test whether version option is set
-   */
-  public boolean hasVersionOption() {
-    if(commandLine.hasOption("version")) {
-      return true;
+    @SuppressWarnings("static-access")
+    Arguments() {
+        // -e 'query'
+        options.addOption(OptionBuilder.hasArg().withArgName("quoted-query-string").withDescription("HPL/SQL from command line").create('e'));
+
+        // -f <file>
+        options.addOption(OptionBuilder.hasArg().withArgName("filename").withDescription("HPL/SQL from a file").create('f'));
+
+        // -main entry_point_name
+        options.addOption(OptionBuilder.hasArg().withArgName("procname").withDescription("Entry point (procedure or function name)").create("main"));
+
+        // -hiveconf x=y
+        options.addOption(OptionBuilder.withValueSeparator().hasArgs(2).withArgName("property=value").withLongOpt("hiveconf").withDescription("Value for given property").create());
+
+        // Substitution option -d, --define
+        options.addOption(OptionBuilder.withValueSeparator().hasArgs(2).withArgName("key=value").withLongOpt("define").withDescription("Variable substitution e.g. -d A=B or --define A=B").create('d'));
+
+        // Substitution option --hivevar
+        options.addOption(OptionBuilder.withValueSeparator().hasArgs(2).withArgName("key=value").withLongOpt("hivevar").withDescription("Variable substitution e.g. --hivevar A=B").create());
+
+        // [-version|--version]
+        options.addOption(new Option("version", "version", false, "Print HPL/SQL version"));
+
+        // [-trace|--trace]
+        options.addOption(new Option("trace", "trace", false, "Print debug information"));
+
+        // [-offline|--offline]
+        options.addOption(new Option("offline", "offline", false, "Offline mode - skip SQL execution"));
+
+        // [-H|--help]
+        options.addOption(new Option("H", "help", false, "Print help information"));
     }
-    return false;
-  }
-  
-  /**
-   * Test whether debug option is set
-   */
-  public boolean hasTraceOption() {
-    if(commandLine.hasOption("trace")) {
-      return true;
+
+    /**
+     * Parse the command line arguments
+     */
+    public boolean parse(String[] args) {
+        try {
+            commandLine = new GnuParser().parse(options, args);
+            LOG.info("解析命令行参数commandLine ==== {}", commandLine);
+
+            execString = commandLine.getOptionValue('e');
+            LOG.info("解析命令行参数execString ==== {}", execString);
+
+            fileName = commandLine.getOptionValue('f');
+            LOG.info("解析命令行参数fileName ==== {}", fileName);
+
+            main = commandLine.getOptionValue("main");
+            LOG.info("解析命令行参数main ==== {}", main);
+            Properties p = commandLine.getOptionProperties("hiveconf");
+            for (String key : p.stringPropertyNames()) {
+                vars.put(key, p.getProperty(key));
+            }
+            p = commandLine.getOptionProperties("hivevar");
+            for (String key : p.stringPropertyNames()) {
+                vars.put(key, p.getProperty(key));
+            }
+            p = commandLine.getOptionProperties("define");
+            for (String key : p.stringPropertyNames()) {
+                vars.put(key, p.getProperty(key));
+            }
+        } catch (ParseException e) {
+            System.err.println(e.getMessage());
+            return false;
+        }
+        for (Map.Entry<String, String> entry : vars.entrySet()) {
+            LOG.info("键 == {},值 == {}", entry.getKey(), entry.getValue());
+        }
+        return true;
     }
-    return false;
-  }
-  
-  /**
-   * Test whether offline option is set
-   */
-  public boolean hasOfflineOption() {
-    if(commandLine.hasOption("offline")) {
-      return true;
+
+    /**
+     * Get the value of execution option -e
+     */
+    public String getExecString() {
+        return execString;
     }
-    return false;
-  }
-  
-  /**
-   * Test whether help option is set
-   */
-  public boolean hasHelpOption() {
-    if(commandLine.hasOption('H')) {
-      return true;
+
+    /**
+     * Get the value of file option -f
+     */
+    public String getFileName() {
+        return fileName;
     }
-    return false;
-  }
-  
-  /**
-   * Print help information
-   */
-  public void printHelp() {
-    new HelpFormatter().printHelp("hplsql", options);
-  }
+
+    /**
+     * Get the value of -main option
+     */
+    public String getMain() {
+        return main;
+    }
+
+    /**
+     * Get the variables
+     */
+    public Map<String, String> getVars() {
+        return vars;
+    }
+
+    /**
+     * Test whether version option is set
+     */
+    public boolean hasVersionOption() {
+        if (commandLine.hasOption("version")) {
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * Test whether debug option is set
+     */
+    public boolean hasTraceOption() {
+        if (commandLine.hasOption("trace")) {
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * Test whether offline option is set
+     */
+    public boolean hasOfflineOption() {
+        if (commandLine.hasOption("offline")) {
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * Test whether help option is set
+     */
+    public boolean hasHelpOption() {
+        if (commandLine.hasOption('H')) {
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * Print help information
+     */
+    public void printHelp() {
+        new HelpFormatter().printHelp("hplsql", options);
+    }
 }
