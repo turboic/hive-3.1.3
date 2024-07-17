@@ -62,6 +62,7 @@
     <module>packaging</module>
     <module>standalone-metastore</module>
     <module>upgrade-acid</module>
+    <module>storage-api</module>
   </modules>
 
   <properties>

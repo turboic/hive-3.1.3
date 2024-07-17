@@ -91,7 +91,7 @@ public class BloomFilter {
 
   public void add(byte[] val) {
     if (val == null) {
-      addBytes(val, -1, -1);
+      addBytes(null, -1, -1);
     } else {
       addBytes(val, 0, val.length);
     }

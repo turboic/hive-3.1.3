@@ -17,6 +17,15 @@ package org.apache.hive.jdbc;
 import java.sql.SQLException;
 
 public class JdbcUriParseException extends SQLException {
+  /**
+   * jdbc 的url解析异常，继承SQL的异常
+   *
+   * 属性message
+   * 和
+   * Throwable故障异常
+   *
+   * 是个检查性异常啦
+   */
 
   private static final long serialVersionUID = 0;
 
