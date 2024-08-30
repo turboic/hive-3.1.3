@@ -350,6 +350,7 @@ public class Utils {
       throws JdbcUriParseException {
     JdbcConnectionParams connParams = new JdbcConnectionParams();
     if (!uri.startsWith(URL_PREFIX)) {
+      //不以jdbc:hive2://开头，则为非法的数据
       throw new JdbcUriParseException("Bad URL format: Missing prefix " + URL_PREFIX);
     }
 

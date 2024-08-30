@@ -23,6 +23,7 @@ import java.sql.SQLException;
 
 /**
  * Table metadata.
+ * 表元数据
  */
 public class JdbcTable {
   private String tableCatalog;
