@@ -327,6 +327,7 @@ public class TezProcessor extends AbstractLogicalIOProcessor {
 
     TezKVOutputCollector(LogicalOutput logicalOutput) {
       this.output = logicalOutput;
+      //逻辑输出
     }
 
     void initialize() throws Exception {

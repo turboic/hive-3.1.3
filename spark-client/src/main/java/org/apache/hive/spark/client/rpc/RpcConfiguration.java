@@ -68,6 +68,7 @@ public final class RpcConfiguration {
 
   public RpcConfiguration(Map<String, String> config) {
     // make sure we don't modify the config in RpcConfiguration
+    //创建不可修改的map数据结构
     this.config = Collections.unmodifiableMap(config);
   }
 

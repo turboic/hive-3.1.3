@@ -68,8 +68,12 @@ public enum HiveCommand {
     if (null == command){
       return null;
     }
+    //字符串数组的第一个字符串
     String cmd = command[0];
+    //为空返回null
+
     if (cmd != null) {
+      //去空格转大写
       cmd = cmd.trim().toUpperCase();
       if (command.length > 1 && "role".equalsIgnoreCase(command[1])) {
         // special handling for set role r1 statement
@@ -82,6 +86,7 @@ public enum HiveCommand {
       } else if (command.length > 1 && "llap".equalsIgnoreCase(command[0])) {
         return getLlapSubCommand(command);
       } else if (COMMANDS.contains(cmd)) {
+        //内置命令，内置命名中唯一具有用于测试的
         HiveCommand hiveCommand = HiveCommand.valueOf(cmd);
 
         if (findOnlyForTesting == hiveCommand.isOnlyForTesting()) {
@@ -94,6 +99,8 @@ public enum HiveCommand {
     return null;
   }
 
+
+  //集群缓存
   private static HiveCommand getLlapSubCommand(final String[] command) {
     if ("cluster".equalsIgnoreCase(command[1])) {
       return LLAP_CLUSTER;

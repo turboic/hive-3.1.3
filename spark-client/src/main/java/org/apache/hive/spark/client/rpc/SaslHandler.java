@@ -17,16 +17,17 @@
 
 package org.apache.hive.spark.client.rpc;
 
-import java.io.IOException;
-import javax.security.sasl.Sasl;
-import javax.security.sasl.SaslException;
-
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.security.sasl.Sasl;
+import javax.security.sasl.SaslException;
+import java.io.IOException;
+
 /**
+ * 需要认证的操作
  * Abstract SASL handler. Abstracts the auth protocol handling and encryption, if it's enabled.
  * Needs subclasses to provide access to the actual underlying SASL implementation (client or
  * server).

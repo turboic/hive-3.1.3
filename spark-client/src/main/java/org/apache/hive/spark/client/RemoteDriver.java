@@ -17,28 +17,15 @@
 
 package org.apache.hive.spark.client;
 
+import com.google.common.base.Joiner;
+import com.google.common.base.Preconditions;
 import com.google.common.base.Throwables;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import com.google.common.io.Files;
+import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.nio.NioEventLoopGroup;
-
-import java.io.File;
-import java.io.IOException;
-import java.io.Serializable;
-import java.net.InetAddress;
-import java.net.URI;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.concurrent.Callable;
-import java.util.concurrent.CopyOnWriteArrayList;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
-import java.util.concurrent.atomic.AtomicInteger;
-
 import org.apache.commons.io.FileUtils;
 import org.apache.hadoop.hive.common.classification.InterfaceAudience;
 import org.apache.hive.spark.client.metrics.Metrics;
@@ -55,14 +42,22 @@ import org.apache.spark.scheduler.SparkListenerJobStart;
 import org.apache.spark.scheduler.SparkListenerTaskEnd;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import scala.Tuple2;
 
-import com.google.common.base.Joiner;
-import com.google.common.base.Preconditions;
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
-import com.google.common.util.concurrent.ThreadFactoryBuilder;
+import java.io.File;
+import java.io.IOException;
+import java.io.Serializable;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.Callable;
+import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * Driver code for the Spark client library.
@@ -91,9 +86,13 @@ public class RemoteDriver {
     private volatile boolean running;
 
     private RemoteDriver(String[] args) throws Exception {
+        //激活的job
         this.activeJobs = Maps.newConcurrentMap();
+        //锁
         this.jcLock = new Object();
+        //关闭锁
         this.shutdownLock = new Object();
+        //文件的临时存储目录，创建10000个临时目录
         localTmpDir = Files.createTempDir();
 
         addShutdownHook();
@@ -212,6 +211,7 @@ public class RemoteDriver {
 
     private synchronized void shutdown(Throwable error) {
         if (running) {
+            //running表示运行中
             if (error == null) {
                 LOG.info("Shutting down remote driver.");
             } else {
@@ -219,6 +219,7 @@ public class RemoteDriver {
             }
             running = false;
             for (JobWrapper<?> job : activeJobs.values()) {
+                //记录提交的job任务
                 cancelJob(job);
             }
             if (error != null) {
@@ -228,8 +229,10 @@ public class RemoteDriver {
                 jc.stop();
             }
             clientRpc.close();
+            //关闭netty
             egroup.shutdownGracefully();
             synchronized (shutdownLock) {
+                //唤醒所有等待的线程资源
                 shutdownLock.notifyAll();
             }
         }
@@ -252,6 +255,7 @@ public class RemoteDriver {
     }
 
     private class DriverProtocol extends BaseProtocol {
+        //驱动协议
 
         void sendError(Throwable error) {
             LOG.debug("Send error to Client: {}", Throwables.getStackTraceAsString(error));
@@ -331,16 +335,17 @@ public class RemoteDriver {
     }
 
     private class JobWrapper<T extends Serializable> implements Callable<Void> {
+        //Job封装类型，实现线程的接口
 
-        private final BaseProtocol.JobRequest<T> req;
-        private final List<JavaFutureAction<?>> jobs;
-        private final AtomicInteger jobEndReceived;
-        private int completed;
-        private SparkCounters sparkCounters;
-        private Set<Integer> cachedRDDIds;
-        private Integer sparkJobId;
+        private final BaseProtocol.JobRequest<T> req;//请求
+        private final List<JavaFutureAction<?>> jobs;//任务信息
+        private final AtomicInteger jobEndReceived;//结束的任务
+        private int completed;//完成
+        private SparkCounters sparkCounters;//spark数量
+        private Set<Integer> cachedRDDIds;//缓存
+        private Integer sparkJobId;//spark任务id
 
-        private Future<?> future;
+        private Future<?> future;//线程的结果
 
         JobWrapper(BaseProtocol.JobRequest<T> req) {
             this.req = req;

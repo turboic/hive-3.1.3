@@ -23,7 +23,6 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
-
 import org.apache.hive.common.util.ShutdownHookManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -81,6 +80,7 @@ public class SparkSessionManagerImpl implements SparkSessionManager {
           LOG.info("Setting up the session manager.");
           Map<String, String> conf = HiveSparkClientFactory.initiateSparkConf(hiveConf, null);
           try {
+            //初始化配置
             SparkClientFactory.initialize(conf);
             inited = true;
           } catch (IOException e) {
@@ -100,10 +100,12 @@ public class SparkSessionManagerImpl implements SparkSessionManager {
   @Override
   public SparkSession getSession(SparkSession existingSession, HiveConf conf, boolean doOpen)
       throws HiveException {
+    //initializing SparkClientFactory
     setup(conf);
 
     if (existingSession != null) {
       // Open the session if it is closed.
+      //复用已经存在的Spark回话
       if (!existingSession.isOpen() && doOpen) {
         existingSession.open(conf);
       }
@@ -118,6 +120,7 @@ public class SparkSessionManagerImpl implements SparkSessionManager {
     if (LOG.isDebugEnabled()) {
       LOG.debug(String.format("New session (%s) is created.", sparkSession.getSessionId()));
     }
+    //放入到缓存hash中
     createdSessions.add(sparkSession);
     return sparkSession;
   }
@@ -144,6 +147,7 @@ public class SparkSessionManagerImpl implements SparkSessionManager {
   @Override
   public void shutdown() {
     LOG.info("Closing the session manager.");
+    //使用synchronized
     synchronized (createdSessions) {
       Iterator<SparkSession> it = createdSessions.iterator();
       while (it.hasNext()) {

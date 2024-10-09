@@ -34,8 +34,12 @@ public class UDFUnbase64 extends UDF {
       return null;
     }
     byte[] bytes = new byte[value.getLength()];
+    //字节复制，使用
     System.arraycopy(value.getBytes(), 0, bytes, 0, value.getLength());
+
+    //编码成字节
     byte[] decoded = Base64.decodeBase64(bytes);
+    //设置字节，从0开启，多少多少个长度
     result.set(decoded, 0, decoded.length);
     return result;
   }

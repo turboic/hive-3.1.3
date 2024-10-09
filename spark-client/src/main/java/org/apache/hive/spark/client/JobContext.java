@@ -17,18 +17,18 @@
 
 package org.apache.hive.spark.client;
 
+import org.apache.hadoop.hive.common.classification.InterfaceAudience;
+import org.apache.hive.spark.counter.SparkCounters;
+import org.apache.spark.api.java.JavaFutureAction;
+import org.apache.spark.api.java.JavaSparkContext;
+
 import java.io.File;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.apache.hadoop.hive.common.classification.InterfaceAudience;
-import org.apache.hive.spark.counter.SparkCounters;
-
-import org.apache.spark.api.java.JavaFutureAction;
-import org.apache.spark.api.java.JavaSparkContext;
-
 /**
+ * 任务执行的上下文
  * Holds runtime information about the job execution context.
  *
  * An instance of this class is kept on the node hosting a remote Spark context and is made
@@ -38,6 +38,7 @@ import org.apache.spark.api.java.JavaSparkContext;
 public interface JobContext {
 
   /** The shared SparkContext instance. */
+  //spark的上下文
   JavaSparkContext sc();
 
   /**

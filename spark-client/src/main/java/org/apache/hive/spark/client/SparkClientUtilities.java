@@ -20,6 +20,16 @@ package org.apache.hive.spark.client;
 
 import com.google.common.base.Joiner;
 import com.google.common.collect.Lists;
+import org.apache.commons.lang.StringUtils;
+import org.apache.hadoop.conf.Configuration;
+import org.apache.hadoop.fs.FileSystem;
+import org.apache.hadoop.fs.Path;
+import org.apache.hadoop.hive.conf.HiveConf;
+import org.apache.spark.SparkContext;
+import org.apache.spark.util.MutableURLClassLoader;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import scala.Option;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -30,17 +40,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-
-import org.apache.commons.lang.StringUtils;
-import org.apache.hadoop.hive.conf.HiveConf;
-import org.apache.spark.SparkContext;
-import org.apache.spark.util.MutableURLClassLoader;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.apache.hadoop.conf.Configuration;
-import org.apache.hadoop.fs.FileSystem;
-import org.apache.hadoop.fs.Path;
-import scala.Option;
 
 public class SparkClientUtilities {
   protected static final transient Logger LOG = LoggerFactory.getLogger(SparkClientUtilities.class);
@@ -176,6 +175,12 @@ public class SparkClientUtilities {
         " jar under " + path.getParent());
   }
 
+
+  /**
+   * 添加jar包到上下文加载器
+   * @param jar
+   * @throws MalformedURLException
+   */
   public static void addJarToContextLoader(File jar) throws MalformedURLException {
     ClassLoader loader = Thread.currentThread().getContextClassLoader();
     if (loader instanceof MutableURLClassLoader) {

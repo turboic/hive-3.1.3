@@ -58,8 +58,8 @@ public class QueryDisplay {
 
   //Inner classes
   public enum Phase {
-    COMPILATION,
-    EXECUTION,
+    COMPILATION,//汇编
+    EXECUTION,//执行
   }
 
   @JsonWriteNullProperties(false)

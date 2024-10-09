@@ -40,6 +40,8 @@ import org.apache.hadoop.io.Text;
 /**
  * UDFToString.
  *
+ * Hive里的字符串是Text啊，hadoop文本类
+ *
  */
 public class UDFToString extends UDF {
   private final Text t = new Text();

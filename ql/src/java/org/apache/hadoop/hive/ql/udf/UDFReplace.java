@@ -43,6 +43,7 @@ public class UDFReplace extends UDF {
     if (s == null || search == null || replacement == null) {
       return null;
     }
+    //生成新的值
     String r = s.toString().replace(search.toString(), replacement.toString());
     result.set(r);
     return result;

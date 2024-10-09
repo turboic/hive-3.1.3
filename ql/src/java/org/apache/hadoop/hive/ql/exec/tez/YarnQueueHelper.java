@@ -42,6 +42,7 @@ public class YarnQueueHelper {
   private final static Logger LOG = LoggerFactory.getLogger(YarnQueueHelper.class);
   private static final String PERMISSION_PATH = "/ws/v1/cluster/queues/%s/access?user=%s";
 
+  //yarn资源管理节点的地址
   private final String[] rmNodes;
   private int lastKnownGoodUrl;
 

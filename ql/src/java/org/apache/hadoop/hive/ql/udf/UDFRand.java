@@ -18,15 +18,15 @@
 
 package org.apache.hadoop.hive.ql.udf;
 
-import java.util.Random;
-
 import org.apache.hadoop.hive.ql.exec.Description;
 import org.apache.hadoop.hive.ql.exec.UDF;
 import org.apache.hadoop.hive.ql.exec.vector.VectorizedExpressions;
-import org.apache.hadoop.hive.ql.exec.vector.expressions.FuncRandNoSeed;
 import org.apache.hadoop.hive.ql.exec.vector.expressions.FuncRand;
+import org.apache.hadoop.hive.ql.exec.vector.expressions.FuncRandNoSeed;
 import org.apache.hadoop.hive.serde2.io.DoubleWritable;
 import org.apache.hadoop.io.LongWritable;
+
+import java.util.Random;
 
 /**
  * UDFRand.
@@ -52,6 +52,12 @@ public class UDFRand extends UDF {
     return result;
   }
 
+
+  /**
+   * 传入固定种子数，生成固定的随机double值
+   * @param seed
+   * @return
+   */
   public DoubleWritable evaluate(LongWritable seed) {
     if (random == null) {
       long seedValue = 0;

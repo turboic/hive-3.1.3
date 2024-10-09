@@ -18,20 +18,19 @@
 
 package org.apache.hadoop.hive.ql.processors;
 
-import static org.apache.commons.lang.StringUtils.isBlank;
+import org.apache.hadoop.hive.conf.HiveConf;
+import org.apache.hadoop.hive.ql.DriverFactory;
+import org.apache.hadoop.hive.ql.metadata.HiveException;
+import org.apache.hadoop.hive.ql.session.SessionState;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+import javax.annotation.Nonnull;
 import java.sql.SQLException;
 import java.util.HashSet;
 import java.util.Set;
 
-import javax.annotation.Nonnull;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import org.apache.hadoop.hive.conf.HiveConf;
-import org.apache.hadoop.hive.ql.DriverFactory;
-import org.apache.hadoop.hive.ql.metadata.*;
-import org.apache.hadoop.hive.ql.session.SessionState;
+import static org.apache.commons.lang.StringUtils.isBlank;
 
 /**
  * CommandProcessorFactory.
@@ -48,10 +47,20 @@ public final class CommandProcessorFactory {
     return getForHiveCommandInternal(cmd, conf, false);
   }
 
+  /***
+   *
+   * @param cmd
+   * @param conf
+   * @param testOnly 仅仅用于测试
+   * @return
+   * @throws SQLException
+   */
   public static CommandProcessor getForHiveCommandInternal(String[] cmd, HiveConf conf,
                                                            boolean testOnly)
     throws SQLException {
+
     HiveCommand hiveCommand = HiveCommand.find(cmd, testOnly);
+
     if (hiveCommand == null || isBlank(cmd[0])) {
       return null;
     }

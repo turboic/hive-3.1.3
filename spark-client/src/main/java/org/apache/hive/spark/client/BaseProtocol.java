@@ -46,10 +46,12 @@ public class BaseProtocol extends RpcDispatcher {
   }
 
   public static class EndSession implements Serializable {
+    //结束会话
 
   }
 
   public static class Error implements Serializable {
+    //错误异常
 
     final String cause;
 
@@ -64,6 +66,7 @@ public class BaseProtocol extends RpcDispatcher {
   }
 
   public static class JobMetrics implements Serializable {
+    //任务监测
 
     final String jobId;
     final int sparkJobId;
@@ -86,6 +89,7 @@ public class BaseProtocol extends RpcDispatcher {
   }
 
   public static class JobRequest<T extends Serializable> implements Serializable {
+    //任务请求
 
     final String id;
     final Job<T> job;
@@ -102,6 +106,7 @@ public class BaseProtocol extends RpcDispatcher {
   }
 
   public static class JobResult<T extends Serializable> implements Serializable {
+    //任务结果
 
     final String id;
     final T result;
@@ -128,6 +133,7 @@ public class BaseProtocol extends RpcDispatcher {
   }
 
   public static class JobStarted implements Serializable {
+    //任务启动
 
     final String id;
 
@@ -145,6 +151,7 @@ public class BaseProtocol extends RpcDispatcher {
    * Inform the client that a new spark job has been submitted for the client job.
    */
   public static class JobSubmitted implements Serializable {
+    //任务提交
     final String clientJobId;
     final int sparkJobId;
 
@@ -159,6 +166,7 @@ public class BaseProtocol extends RpcDispatcher {
   }
 
   public static class SyncJobRequest<T extends Serializable> implements Serializable {
+    //同步请求
 
     final Job<T> job;
 

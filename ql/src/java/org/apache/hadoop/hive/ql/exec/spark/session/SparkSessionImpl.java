@@ -106,24 +106,39 @@ public class SparkSessionImpl implements SparkSession {
 
   @Override
   public ObjectPair<Long, Integer> getMemoryAndCores() throws Exception {
+    //spark配置
     SparkConf sparkConf = hiveSparkClient.getSparkConf();
+    //执行数量
     int numExecutors = hiveSparkClient.getExecutorCount();
     // at start-up, we may be unable to get number of executors
     if (numExecutors <= 0) {
       return new ObjectPair<Long, Integer>(-1L, -1);
     }
+
+    //执行内存
     int executorMemoryInMB = Utils.memoryStringToMb(
         sparkConf.get("spark.executor.memory", "512m"));
+
+
     double memoryFraction = 1.0 - sparkConf.getDouble("spark.storage.memoryFraction", 0.6);
+
+    //总内存
     long totalMemory = (long) (numExecutors * executorMemoryInMB * memoryFraction * 1024 * 1024);
+
     int totalCores;
+
+    //spark的管理节点地址
     String masterURL = sparkConf.get("spark.master");
     if (masterURL.startsWith("spark") || masterURL.startsWith("local")) {
+
+
+      //设置hive的执行并行度
       totalCores = sparkConf.contains("spark.default.parallelism") ?
           sparkConf.getInt("spark.default.parallelism", 1) :
           hiveSparkClient.getDefaultParallelism();
       totalCores = Math.max(totalCores, numExecutors);
     } else {
+      //一核心
       int coresPerExecutor = sparkConf.getInt("spark.executor.cores", 1);
       totalCores = numExecutors * coresPerExecutor;
     }

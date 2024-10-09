@@ -16,16 +16,14 @@
  */
 
 package org.apache.hive.spark.client;
-
+import org.apache.hadoop.hive.common.classification.InterfaceAudience;
+import org.apache.hive.spark.counter.SparkCounters;
 import java.io.Serializable;
 import java.util.List;
 import java.util.concurrent.Future;
 
-import org.apache.hadoop.hive.common.classification.InterfaceAudience;
-
-import org.apache.hive.spark.counter.SparkCounters;
-
 /**
+ * 任务提交的操作   允许监控和控制远程的job
  * A handle to a submitted job. Allows for monitoring and controlling of the running remote job.
  */
 @InterfaceAudience.Private
@@ -34,6 +32,7 @@ public interface JobHandle<T extends Serializable> extends Future<T> {
   /**
    * The client job ID. This is unrelated to any Spark jobs that might be triggered by the
    * submitted job.
+   * 获取客户端任务的ID
    */
   String getClientJobId();
 

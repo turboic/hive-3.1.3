@@ -17,23 +17,21 @@
 
 package org.apache.hive.spark.client;
 
-import java.io.IOException;
-import java.io.PrintStream;
-import java.util.Map;
-
-import org.apache.hadoop.hive.common.classification.InterfaceAudience;
-import org.apache.hadoop.hive.conf.HiveConf;
-import org.apache.hive.spark.client.rpc.RpcException;
-import org.apache.hive.spark.client.rpc.RpcServer;
-import org.apache.spark.SparkException;
-
 import com.google.common.base.Preconditions;
 import com.google.common.base.Throwables;
+import org.apache.hadoop.hive.common.classification.InterfaceAudience;
+import org.apache.hadoop.hive.conf.HiveConf;
+import org.apache.hive.spark.client.rpc.RpcServer;
+import org.apache.spark.SparkException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.IOException;
+import java.util.Map;
+
 /**
  * Factory for SparkClient instances.
+ * 客户端的工厂实例
  */
 @InterfaceAudience.Private
 public final class SparkClientFactory {
@@ -42,9 +40,12 @@ public final class SparkClientFactory {
 
 
   /** Used by client and driver to share a client ID for establishing an RPC session. */
+  //配置客户端id
   static final String CONF_CLIENT_ID = "spark.client.authentication.client_id";
 
   /** Used by client and driver to share a secret for establishing an RPC session. */
+
+  //配置安全键值
   static final String CONF_KEY_SECRET = "spark.client.authentication.secret";
 
   private static volatile RpcServer server = null;

@@ -54,6 +54,7 @@ public class UDFMd5 extends UDF {
 
   /**
    * Convert String to md5
+   * 评价评估的意思
    */
   public Text evaluate(Text n) {
     if (n == null) {

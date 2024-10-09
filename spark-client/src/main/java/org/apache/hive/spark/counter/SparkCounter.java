@@ -61,6 +61,7 @@ public class SparkCounter implements Serializable {
 
     this.name = name;
     this.displayName = displayName;
+    //累积器名称
     String accumulatorName = groupName + "_" + name;
     this.accumulator = sparkContext.sc().longAccumulator(accumulatorName);
   }

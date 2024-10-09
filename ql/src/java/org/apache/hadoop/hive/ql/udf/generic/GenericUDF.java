@@ -207,6 +207,7 @@ public abstract class GenericUDF implements Closeable {
    *          The arguments as DeferedObject, use DeferedObject.get() to get the
    *          actual argument Object. The Objects can be inspected by the
    *          ObjectInspectors passed in the initialize call.
+   *          子类需要实现的方法
    * @return The
    */
   public abstract Object evaluate(DeferredObject[] arguments)

@@ -45,6 +45,7 @@ public class UDFSqrt extends UDFMath {
     if (a.get() < 0) {
       return null;
     } else {
+      //依赖于数学函数
       result.set(Math.sqrt(a.get()));
       return result;
     }

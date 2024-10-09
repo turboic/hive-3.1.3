@@ -42,6 +42,8 @@ import org.apache.hadoop.hive.serde2.objectinspector.ObjectInspector.Category;
 @InterfaceStability.Stable
 public abstract class TypeInfo implements Serializable {
 
+  //类型信息
+
   private static final long serialVersionUID = 1L;
 
   protected TypeInfo() {

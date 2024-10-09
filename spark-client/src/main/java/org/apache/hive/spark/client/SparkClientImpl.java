@@ -17,14 +17,17 @@
 
 package org.apache.hive.spark.client;
 
-import com.google.common.base.*;
+import com.google.common.base.Charsets;
+import com.google.common.base.Joiner;
+import com.google.common.base.Preconditions;
+import com.google.common.base.Strings;
+import com.google.common.base.Throwables;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.io.Resources;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.util.concurrent.GenericFutureListener;
 import io.netty.util.concurrent.Promise;
-import net.minidev.json.JSONUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.hadoop.hive.common.log.LogRedirector;
 import org.apache.hadoop.hive.conf.Constants;
@@ -40,11 +43,23 @@ import org.apache.spark.SparkException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.*;
+import java.io.ByteArrayInputStream;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStreamWriter;
+import java.io.Serializable;
+import java.io.Writer;
 import java.net.URI;
 import java.net.URL;
 import java.security.CodeSource;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Properties;
+import java.util.UUID;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeoutException;
 
@@ -112,13 +127,10 @@ class SparkClientImpl implements SparkClient {
             throw Throwables.propagate(e);
         }
 
-        driverRpc.addListener(new Rpc.Listener() {
-            @Override
-            public void rpcClosed(Rpc rpc) {
-                if (isAlive) {
-                    LOG.info("客户端   Client RPC channel closed unexpectedly.");
-                    isAlive = false;
-                }
+        driverRpc.addListener(rpc -> {
+            if (isAlive) {
+                LOG.info("客户端   Client RPC channel closed unexpectedly.");
+                isAlive = false;
             }
         });
         isAlive = true;
@@ -502,37 +514,45 @@ class SparkClientImpl implements SparkClient {
 
     private class ClientProtocol extends BaseProtocol {
 
+        /**
+         *
+         * @param job 任务
+         * @param listeners 、任务操作的监听
+         * @return 返回结果
+         * @param <T>
+         */
         <T extends Serializable> JobHandleImpl<T> submit(Job<T> job, List<JobHandle.Listener<T>> listeners) {
             final String jobId = UUID.randomUUID().toString();
+
+            //应答
             final Promise<T> promise = driverRpc.createPromise();
             final JobHandleImpl<T> handle = new JobHandleImpl<T>(SparkClientImpl.this, promise, jobId, listeners);
+            //记录任务id和任务处理handler
             jobs.put(jobId, handle);
 
+            //执行rpc的call方法
             final io.netty.util.concurrent.Future<Void> rpc = driverRpc.call(new JobRequest(jobId, job));
             LOG.debug("Send JobRequest[{}].", jobId);
 
             // Link the RPC and the promise so that events from one are propagated to the other as
             // needed.
-            rpc.addListener(new GenericFutureListener<io.netty.util.concurrent.Future<Void>>() {
-                @Override
-                public void operationComplete(io.netty.util.concurrent.Future<Void> f) {
-                    if (f.isSuccess()) {
-                        // If the spark job finishes before this listener is called, the QUEUED status will not be set
-                        handle.changeState(JobHandle.State.QUEUED);
-                    } else if (!promise.isDone()) {
-                        promise.setFailure(f.cause());
-                    }
+            rpc.addListener((GenericFutureListener<io.netty.util.concurrent.Future<Void>>) f -> {
+                if (f.isSuccess()) {
+                    // If the spark job finishes before this listener is called, the QUEUED status will not be set
+                    //如果是成功的，handle要改变状态
+                    handle.changeState(JobHandle.State.QUEUED);
+                } else if (!promise.isDone()) {
+                    //promise未完成，表示失败的
+                    promise.setFailure(f.cause());
                 }
             });
-            promise.addListener(new GenericFutureListener<Promise<T>>() {
-                @Override
-                public void operationComplete(Promise<T> p) {
-                    if (jobId != null) {
-                        jobs.remove(jobId);
-                    }
-                    if (p.isCancelled() && !rpc.isDone()) {
-                        rpc.cancel(true);
-                    }
+            //promise像是应答响应
+            promise.addListener((GenericFutureListener<Promise<T>>) p -> {
+                if (jobId != null) {
+                    jobs.remove(jobId);
+                }
+                if (p.isCancelled() && !rpc.isDone()) {
+                    rpc.cancel(true);
                 }
             });
             return handle;

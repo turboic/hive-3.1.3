@@ -17,19 +17,19 @@
  */
 package org.apache.hive.spark.counter;
 
+import org.apache.spark.api.java.JavaSparkContext;
+
 import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
-
-import org.apache.spark.api.java.JavaSparkContext;
 
 /**
  * We use group to fold all the same kind of counters.
  */
 public class SparkCounterGroup implements Serializable {
   private static final long serialVersionUID = 1L;
-  private String groupName;
-  private String groupDisplayName;
+  private String groupName;//组名
+  private String groupDisplayName;//组显示的名称
   private Map<String, SparkCounter> sparkCounters;
 
   private transient JavaSparkContext javaSparkContext;

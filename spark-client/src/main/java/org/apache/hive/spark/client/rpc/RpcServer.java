@@ -17,32 +17,10 @@
 
 package org.apache.hive.spark.client.rpc;
 
-import java.io.Closeable;
-import java.io.IOException;
-import java.net.InetSocketAddress;
-import java.security.SecureRandom;
-import java.util.List;
-import java.util.Map;
-import java.util.Random;
-import java.util.concurrent.ConcurrentMap;
-import java.util.concurrent.TimeoutException;
-import java.util.concurrent.TimeUnit;
-
-import javax.security.auth.callback.Callback;
-import javax.security.auth.callback.CallbackHandler;
-import javax.security.auth.callback.NameCallback;
-import javax.security.auth.callback.PasswordCallback;
-import javax.security.sasl.AuthorizeCallback;
-import javax.security.sasl.RealmCallback;
-import javax.security.sasl.Sasl;
-import javax.security.sasl.SaslException;
-import javax.security.sasl.SaslServer;
-
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Maps;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
-
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;
@@ -56,15 +34,36 @@ import io.netty.util.concurrent.Future;
 import io.netty.util.concurrent.GenericFutureListener;
 import io.netty.util.concurrent.Promise;
 import io.netty.util.concurrent.ScheduledFuture;
-
+import org.apache.hadoop.hive.common.classification.InterfaceAudience;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.apache.hadoop.hive.common.classification.InterfaceAudience;
+
+import javax.security.auth.callback.Callback;
+import javax.security.auth.callback.CallbackHandler;
+import javax.security.auth.callback.NameCallback;
+import javax.security.auth.callback.PasswordCallback;
+import javax.security.sasl.AuthorizeCallback;
+import javax.security.sasl.RealmCallback;
+import javax.security.sasl.Sasl;
+import javax.security.sasl.SaslException;
+import javax.security.sasl.SaslServer;
+import java.io.Closeable;
+import java.io.IOException;
+import java.net.InetSocketAddress;
+import java.security.SecureRandom;
+import java.util.List;
+import java.util.Map;
+import java.util.Random;
+import java.util.concurrent.ConcurrentMap;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 
 /**
  * An RPC server. The server matches remote clients based on a secret that is generated on
  * the server - the secret needs to be given to the client through some other mechanism for
  * this to work.
+ *
+ * 服务匹配远程客户端
  */
 @InterfaceAudience.Private
 public class RpcServer implements Closeable {
@@ -86,13 +85,33 @@ public class RpcServer implements Closeable {
 
 
         LOG.info("RpcServer NioEventLoopGroup group 设置成受线程");
+        //线程数量和线程工程，设置成守护的线程
         this.group = new NioEventLoopGroup(this.config.getRpcThreadCount(), new ThreadFactoryBuilder().setNameFormat("RPC-Handler-%d").setDaemon(true).build());
 
+        //基于netty设置线程处理器，NioServerSocketChannel非阻塞io，用于处理TCP套接字连接
+        /**
+         * NioServerSocketChannel 是 Netty 中的一种通道（Channel），用于实现基于 NIO（非阻塞 I/O） 的服务器端套接字。它是 Netty 的网络编程框架的一部分，通常用于处理 TCP 连接。         *
+         * 主要功能和特点
+         * 非阻塞 I/O:
+         *
+         * NioServerSocketChannel 使用 Java NIO 提供的非阻塞 I/O，这意味着它可以处理多个连接，而不需要为每个连接都创建一个线程。这使得它在高并发场景下表现良好。
+         * 接受连接:
+         *
+         * 该通道负责监听客户端的连接请求。当有客户端尝试连接时，它会接受这些连接，并为每个连接创建一个新的 NioSocketChannel 实例来进行数据交换。
+         * 事件驱动:
+         *
+         * Netty 是基于事件驱动的架构，NioServerSocketChannel 通过事件循环（EventLoop）来处理连接和I/O事件，使其在处理高并发时效率更高。
+         * 配置灵活:
+         *
+         * 您可以通过 Netty 提供的丰富的配置选项设置 NioServerSocketChannel 的各种参数，比如连接超时、背压策略、SSL/TLS 支持等。
+         */
 
         ServerBootstrap serverBootstrap = new ServerBootstrap().group(group).channel(NioServerSocketChannel.class).childHandler(new ChannelInitializer<SocketChannel>() {
             @Override
             public void initChannel(SocketChannel ch) throws Exception {
+                //加密配置
                 SaslServerHandler saslHandler = new SaslServerHandler(config);
+                //创建rpc实例,参数：需要认证处理的，配置、通道、组信息
                 final Rpc newRpc = Rpc.createServer(saslHandler, config, ch, group);
                 saslHandler.rpc = newRpc;
 
@@ -100,13 +119,16 @@ public class RpcServer implements Closeable {
                     @Override
                     public void run() {
                         LOG.warn("Timed out waiting for hello from client.");
+                        //超时关闭rpc实例
                         newRpc.close();
                     }
                 };
+                //rpc超时退出任务
                 saslHandler.cancelTask = group.schedule(cancelTask, RpcServer.this.config.getConnectTimeoutMs(), TimeUnit.MILLISECONDS);
 
             }
         }).option(ChannelOption.SO_REUSEADDR, true).childOption(ChannelOption.SO_KEEPALIVE, true);
+        //ChannelOption.SO_REUSEADDR 是 Netty 中的一种通道选项，用于设置套接字的地址重用功能。将其设置为 true 允许多个套接字绑定到相同的地址和端口。
 
         this.channel = bindServerPort(serverBootstrap).channel();
         this.port = ((InetSocketAddress) channel.localAddress()).getPort();
@@ -157,28 +179,31 @@ public class RpcServer implements Closeable {
         return registerClient(clientId, secret, serverDispatcher, config.getServerConnectTimeoutMs());
     }
 
+    /**
+     * 这段代码的主要功能是异步注册一个客户端，设置超时机制，并管理正在进行的客户端连接。通过使用 Promise 和 Future，它允许调用者在稍后处理连接结果，同时避免阻塞主线程。
+     * @param clientId
+     * @param secret
+     * @param serverDispatcher
+     * @param clientTimeoutMs
+     * @return
+     */
     @VisibleForTesting
     Future<Rpc> registerClient(final String clientId, String secret, RpcDispatcher serverDispatcher, long clientTimeoutMs) {
         final Promise<Rpc> promise = group.next().newPromise();
+        //创建一个新的 Promise<Rpc> 对象，用于表示异步操作的结果。
 
-        Runnable timeout = new Runnable() {
-            @Override
-            public void run() {
-                promise.setFailure(new TimeoutException("Timed out waiting for client connection."));
-            }
-        };
+        Runnable timeout = () -> promise.setFailure(new TimeoutException("Timed out waiting for client connection."));
+
+        //客户端超时配置
         ScheduledFuture<?> timeoutFuture = group.schedule(timeout, clientTimeoutMs, TimeUnit.MILLISECONDS);
         final ClientInfo client = new ClientInfo(clientId, promise, secret, serverDispatcher, timeoutFuture);
         if (pendingClients.putIfAbsent(clientId, client) != null) {
             throw new IllegalStateException(String.format("Client '%s' already registered.", clientId));
         }
 
-        promise.addListener(new GenericFutureListener<Promise<Rpc>>() {
-            @Override
-            public void operationComplete(Promise<Rpc> p) {
-                if (!p.isSuccess()) {
-                    pendingClients.remove(clientId);
-                }
+        promise.addListener((GenericFutureListener<Promise<Rpc>>) p -> {
+            if (!p.isSuccess()) {
+                pendingClients.remove(clientId);
             }
         });
 
@@ -272,7 +297,7 @@ public class RpcServer implements Closeable {
                 client = pendingClients.get(clientId);
                 Preconditions.checkArgument(client != null, "Unexpected client ID '%s' in SASL handshake.", clientId);
             }
-
+            //challenge.payload是有效的荷载
             return new Rpc.SaslMessage(server.evaluateResponse(challenge.payload));
         }
 

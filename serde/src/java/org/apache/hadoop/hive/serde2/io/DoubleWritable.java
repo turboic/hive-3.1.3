@@ -22,11 +22,6 @@
  */
 package org.apache.hadoop.hive.serde2.io;
 
-import java.io.DataInput;
-import java.io.DataOutput;
-import java.io.IOException;
-
-import org.apache.hadoop.io.WritableComparable;
 import org.apache.hadoop.io.WritableComparator;
 
 /**
@@ -42,10 +37,13 @@ public class DoubleWritable extends org.apache.hadoop.io.DoubleWritable {
   }
 
   public DoubleWritable(double value) {
+    //给他爸爸的value赋值，并且value还是私有的
     super(value);
   }
 
   static { // register this comparator
+    //缓存上下文
+    //static只加载一次
     WritableComparator.define(DoubleWritable.class, new Comparator());
   }
 

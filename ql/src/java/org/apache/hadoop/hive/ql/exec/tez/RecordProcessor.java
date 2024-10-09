@@ -48,17 +48,32 @@ import com.google.common.collect.Maps;
  * It has different subclasses for map and reduce processing
  */
 public abstract class RecordProcessor extends InterruptibleProcessing {
+
+  //hadoop的配置mapred
   protected final JobConf jconf;
+
+
+  //输入
   protected Map<String, LogicalInput> inputs;
+
+
+  //输出
   protected Map<String, LogicalOutput> outputs;
   protected Map<String, OutputCollector> outMap;
+
+  //处理上下文
   protected final ProcessorContext processorContext;
 
   public static final Logger l4j = LoggerFactory.getLogger(RecordProcessor.class);
 
+
+  //mr任务报告
   protected MRTaskReporter reporter;
 
+  //记录
   protected PerfLogger perfLogger = SessionState.getPerfLogger();
+
+  //类名
   protected String CLASS_NAME = RecordProcessor.class.getName();
 
   public RecordProcessor(JobConf jConf, ProcessorContext processorContext) {
@@ -79,6 +94,7 @@ public abstract class RecordProcessor extends InterruptibleProcessing {
     this.inputs = inputs;
     this.outputs = outputs;
 
+    //检查当前显示是Runnable状态
     checkAbortCondition();
 
     //log classpaths
