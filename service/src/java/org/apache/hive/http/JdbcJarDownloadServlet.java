@@ -40,6 +40,8 @@ public class JdbcJarDownloadServlet extends HttpServlet {
 
   private static final String JDBC_JAR_DIR = System.getenv("HIVE_HOME") + "/jdbc/";
   private static final String JDBC_JAR_PATTERN = "hive-jdbc-*-standalone.jar";
+
+  //下载附件
   private static final String JAR_CONTENT_DISPOSITION = "attachment; filename=hive-jdbc-standalone.jar";
   private static final String JAR_CONTENT_TYPE = "application/java-archive";
 
