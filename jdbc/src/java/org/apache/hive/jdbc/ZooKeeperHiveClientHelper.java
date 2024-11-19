@@ -68,7 +68,7 @@ class ZooKeeperHiveClientHelper {
   public static boolean isZkHADynamicDiscoveryMode(Map<String, String> sessionConf) {
     final String discoveryMode = sessionConf.get(JdbcConnectionParams.SERVICE_DISCOVERY_MODE);
     return (discoveryMode != null) &&
-      JdbcConnectionParams.SERVICE_DISCOVERY_MODE_ZOOKEEPER_HA.equalsIgnoreCase(discoveryMode);
+      JdbcConnectionParams.SERVICE_DISCOVERY_MODE_ZOOKEEPER_HA.equalsIgnoreCase(discoveryMode);//高可用模式
   }
 
   /**

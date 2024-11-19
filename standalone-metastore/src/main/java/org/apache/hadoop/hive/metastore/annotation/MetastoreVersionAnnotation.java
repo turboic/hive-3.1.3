@@ -28,6 +28,7 @@ import java.lang.annotation.Target;
 
 /**
  * HiveVersionAnnotation.
+ * 元数据版本注解
  *
  */
 @Retention(RetentionPolicy.RUNTIME)
