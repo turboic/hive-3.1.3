@@ -56,19 +56,29 @@ import org.apache.hadoop.hive.metastore.api.Table;
 import org.apache.hadoop.util.ReflectionUtils;
 
 /**
+ * 表存储的数据仓库
  * This class represents a warehouse where data of Hive tables is stored
  */
 public class Warehouse {
+  //默认的catalog名称
   public static final String DEFAULT_CATALOG_NAME = "hive";
   public static final String DEFAULT_CATALOG_COMMENT = "Default catalog, for Hive";
+
+  //默认的数据库名
   public static final String DEFAULT_DATABASE_NAME = "default";
   public static final String DEFAULT_DATABASE_COMMENT = "Default Hive database";
   public static final String DEFAULT_SERIALIZATION_FORMAT = "1";
+
+  //后缀
   public static final String DATABASE_WAREHOUSE_SUFFIX = ".db";
+
+  //数据库和表的分隔符
   private static final String CAT_DB_TABLE_SEPARATOR = ".";
 
   private Path whRoot;
   private Path whRootExternal;
+
+  //hadoop的配置
   private final Configuration conf;
   private final String whRootString;
   private final String whRootExternalString;
@@ -81,6 +91,7 @@ public class Warehouse {
 
   public Warehouse(Configuration conf) throws MetaException {
     this.conf = conf;
+    //
     whRootString = MetastoreConf.getVar(conf, ConfVars.WAREHOUSE);
     if (StringUtils.isBlank(whRootString)) {
       throw new MetaException(ConfVars.WAREHOUSE.getVarname()
